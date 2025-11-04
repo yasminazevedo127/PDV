@@ -3,91 +3,93 @@ package sale;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import product.Product;
+import product.ProductRepository;
 
 public class Main {
-	private List<Product> products = new ArrayList<>();
 	private List<Sale> sales = new ArrayList<>();
+	private static ProductRepository products = new ProductRepository();
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		Scanner scanner = new Scanner(System.in);
+		int opcao;
+
+		while(true) {
+	        System.out.println("Digite a opção que deseja: ");
+	        System.out.println("1- registrar produto");
+	        System.out.println("2- adicionar produto no estoque");
+	        System.out.println("3- listar produtos");
+	        System.out.println("4- sair");
+
+	        opcao = Integer.parseInt(scanner.nextLine());
+	        if(opcao == 1) {
+	        	System.out.println("Digite o nome do produto:");
+	        	String nome = scanner.nextLine();
+	        	System.out.println("Digite o codigo do produto");
+	        	int code = Integer.parseInt(scanner.nextLine());
+	        	System.out.println("Digite o preço do produto");
+	        	double price = Double.parseDouble(scanner.nextLine());
+	        	
+	        	products.registerProduct(nome, code, price);
+	        	System.out.println("");
+	        }
+	        else if(opcao == 2) {
+	        	System.out.println("Digite o codigo do produto");
+	        	int code = scanner.nextInt();
+	        	System.out.println("Digite o preço do produto");
+	        	int quantity = scanner.nextInt();
+	        	
+	        	products.addStock(code, quantity);
+	        	System.out.println("");
+	        }
+	        else if(opcao == 3) {
+	    		products.listProducts();
+	    		System.out.println("");
+	        }
+	        else if(opcao == 4) {
+	        	scanner.close();
+	        	System.exit(0);
+	        }
+	        else {
+	        	System.out.println("Escolha uma opção existente");
+	        }
+	       
+		}
 
 	}
+
 	
-	
-	
-	public Product findProduct(int code) {
-        return products.stream()
-                .filter(p -> p.getCode() == code)
-                .findFirst()
-                .orElse(null);
+	 
+	public void registerSale(SaleType type, String address, Map<Integer, Integer> itemsMap) {
+	    Sale sale = (type == SaleType.STORE) ? new Store() : new Web(address);
+
+	    for (Map.Entry<Integer, Integer> entry : itemsMap.entrySet()) {
+            Product p = products.findProduct(entry.getKey());
+            int quantity = entry.getValue();
+            try {
+                if (p == null)
+                    throw new IllegalArgumentException("Product not found: " + entry.getKey());
+                if (!p.removeStock(quantity))
+                    throw new IllegalStateException("Insufficient stock for " + p.getName());
+					
+                sale.addItem(p, quantity);
+            } catch (IllegalArgumentException | IllegalStateException e) {
+            	System.out.println("⚠️ " + e.getMessage());
+            }
+        }
+
+        if (!sale.getItems().isEmpty()) {
+            sales.add(sale);
+            System.out.println("Sale registered successfully!");
+            System.out.println(sale); 
+        } else {
+            System.out.println("No valid items in sale. Sale not registered.");
+        }
     }
 	
-	 public void registerProduct(String name, int code, double price) {
-	        try {
-	            if (findProduct(code) != null)
-	                throw new IllegalStateException("Product code already exists: " + code);
-	            if (price <= 0) throw new IllegalArgumentException("Price must be positive");
-
-	            products.add(new Product(name, code, price));
-	            System.out.println("Product registered successfully.");
-	        } catch (IllegalArgumentException | IllegalStateException e) {
-	            System.out.println("⚠️ " + e.getMessage());
-	        }
-	    }
-	 
-	 public void listProducts() {
-	        if (products.isEmpty()) {
-	            System.out.println("No products registered.");
-	            return;
-	        }
-	        for (Product p : products) System.out.println(p);
-	    }
-	 
-	 public void addStock(int code, int quantity) {
-	        try {
-	            Product p = findProduct(code);
-	            if (p == null) throw new IllegalArgumentException("Product not found: " + code);
-	            if (quantity <= 0) throw new IllegalArgumentException("Quantity must be positive");
-
-	            p.addStock(quantity);
-	            System.out.println("Stock updated successfully.");
-	        } catch (IllegalArgumentException e) {
-	            System.out.println("⚠️ " + e.getMessage());
-	        }
-	    }
-	 
-	 public void registerSale(SaleType type, String address, Map<Integer, Integer> itemsMap) {
-	        Sale sale = (type == SaleType.STORE) ? new Store() : new Web(address);
-
-	        for (Map.Entry<Integer, Integer> entry : itemsMap.entrySet()) {
-	            Product p = findProduct(entry.getKey());
-	            int quantity = entry.getValue();
-
-	            try {
-	                if (p == null)
-	                    throw new IllegalArgumentException("Product not found: " + entry.getKey());
-	                if (!p.removeStock(quantity))
-	                    throw new IllegalStateException("Insufficient stock for " + p.getName());
-
-	                sale.addItem(p, quantity);
-
-	            } catch (IllegalArgumentException | IllegalStateException e) {
-	                System.out.println("⚠️ " + e.getMessage());
-	            }
-	        }
-
-	        if (!sale.getItems().isEmpty()) {
-	            sales.add(sale);
-	            System.out.println("Sale registered successfully!");
-	            System.out.println(sale); 
-	        } else {
-	            System.out.println("No valid items in sale. Sale not registered.");
-	        }
-	    }
-	
-	 public void listSales() {
+	public void listSales() {
 	        if (sales.isEmpty()) {
 	            System.out.println("No sales registered.");
 	            return;
