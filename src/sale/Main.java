@@ -27,19 +27,21 @@ public class Main {
 	        if(opcao == 1) {
 	        	System.out.println("Digite o nome do produto:");
 	        	String nome = scanner.nextLine();
+	        	
 	        	System.out.println("Digite o codigo do produto");
-	        	int code = Integer.parseInt(scanner.nextLine());
+	        	int code = inputInt(scanner);
+	        	
 	        	System.out.println("Digite o preço do produto");
-	        	double price = Double.parseDouble(scanner.nextLine());
+	        	double price = inputDouble(scanner);
 	        	
 	        	products.registerProduct(nome, code, price);
 	        	System.out.println("");
 	        }
 	        else if(opcao == 2) {
 	        	System.out.println("Digite o codigo do produto");
-	        	int code = scanner.nextInt();
+	        	int code = inputInt(scanner);
 	        	System.out.println("Digite o preço do produto");
-	        	int quantity = scanner.nextInt();
+	        	int quantity = inputInt(scanner);
 	        	
 	        	products.addStock(code, quantity);
 	        	System.out.println("");
@@ -50,6 +52,7 @@ public class Main {
 	        }
 	        else if(opcao == 4) {
 	        	scanner.close();
+	        	System.out.println("Encerrando programa");
 	        	System.exit(0);
 	        }
 	        else {
@@ -59,9 +62,53 @@ public class Main {
 		}
 
 	}
-
 	
-	 
+	public static Integer convertToInt(String x) {
+		try {
+				int resultado = Integer.parseInt(x);
+				return resultado;
+		}
+		catch(NumberFormatException e){
+			return null;
+		}
+		
+	}
+	
+	public static int inputInt(Scanner scanner) {
+		while(true) {
+			String input = scanner.nextLine();
+			Integer resultado = convertToInt(input);
+        	if(resultado == null) {
+        		System.out.println("Digite um valor inteiro");
+        		continue;
+        	}
+        	return resultado;
+		}
+	}
+	
+	public static Double convertToDouble (String x) {
+		try {
+				double resultado = Double.parseDouble(x);
+				return resultado;
+		}
+		catch(NumberFormatException e){
+			return null;
+		}
+		
+	}
+	
+	public static double inputDouble(Scanner scanner) {
+		while(true) {
+			String input = scanner.nextLine();
+			Double resultado = convertToDouble(input);
+        	if(resultado == null) {
+        		System.out.println("Digite um valor real");
+        		continue;
+        	}
+        	return resultado;
+		}
+	}
+	
 	public void registerSale(SaleType type, String address, Map<Integer, Integer> itemsMap) {
 	    Sale sale = (type == SaleType.STORE) ? new Store() : new Web(address);
 
