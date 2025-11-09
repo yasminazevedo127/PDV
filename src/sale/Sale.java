@@ -19,13 +19,8 @@ public abstract class Sale {
 	
 	public abstract SaleType getType();
 	
-	public boolean addItem(Product product, int quantity) {
-		if (product.removeStock(quantity)) {
-            items.add(new SaleItem(product, quantity));
-            return true;
-        } else {
-        	return false;
-        }
+	public void addItem(Product product, int quantity) {
+        items.add(new SaleItem(product, quantity));
 	}
 	
 	public double getTotal() {

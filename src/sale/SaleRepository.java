@@ -21,7 +21,7 @@ public class SaleRepository {
             Product selectedProduct = products.findProduct(wishList.get(i).getCode());
             if (selectedProduct.getStock() - qntList.get(i) >= 0) {
                 sale.addItem(selectedProduct, qntList.get(i));
-                selectedProduct.removeStock(0);
+                selectedProduct.removeStock(qntList.get(i));
                 continue;
             } else {
                 System.out.println("\nThis item is not available in the required quantity: " 
@@ -39,7 +39,7 @@ public class SaleRepository {
             System.out.println("No sales registered.");
             return;
         }
-        for (Sale s : sales) {
+        for ( Sale s : sales) {
             System.out.println("Sale #" + s.id + ":\n");
             for (SaleItem si : s.getItems()) {
                 Product p = si.getProduct();
@@ -122,7 +122,7 @@ public class SaleRepository {
         List<Tuple<Product, Integer>> filteredProducts = filterAmongSales(allProducts);
 
         for (Tuple<Product, Integer> t : filteredProducts) {
-            System.out.println('\t' + t.left.getName() + " | Price: $" + t.left.getPrice() + " | Qty: " + t.right + '\n');
+            System.out.println('\t' + t.left.getName() + " | Price: $" + t.left.getPrice() + " | Quantity: " + t.right + '\n');
         }
     }
 

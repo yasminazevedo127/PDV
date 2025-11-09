@@ -11,6 +11,12 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int option;
+        String name;
+        int code;
+        double price;
+        int quantity;
+        int location;
+        String address;
 
         while (true) {
             showMenu();
@@ -20,13 +26,13 @@ public class Main {
 
                 case 1:
                     System.out.println("Enter product name:");
-                    String name = scanner.nextLine();
+                    name = scanner.nextLine();
 
                     System.out.println("Enter product code:");
-                    int code = inputInt(scanner);
+                    code = inputInt(scanner);
 
                     System.out.println("Enter product price:");
-                    double price = inputDouble(scanner);
+                    price = inputDouble(scanner);
 
                     products.registerProduct(name, code, price);
                     System.out.println();
@@ -40,17 +46,17 @@ public class Main {
                 case 3:
                     while (true) {
                         System.out.println("Enter product code:");
-                        int code3 = inputInt(scanner);
+                        code = inputInt(scanner);
 
-                        if (products.findProduct(code3) == null) {
+                        if (products.findProduct(code) == null) {
                             System.out.println("Please enter a valid product.");
                             continue;
                         }
 
                         System.out.println("Enter quantity to add to stock:");
-                        int quantity = inputInt(scanner);
+                        quantity = inputInt(scanner);
 
-                        products.addStock(code3, quantity);
+                        products.addStock(code, quantity);
                         System.out.println();
                         break;
                     }
@@ -58,7 +64,7 @@ public class Main {
 
                 case 4:
                     SaleType saleType;
-                    String address = null;
+                    address = null;
                     ArrayList<Product> wishList = new ArrayList<>();
                     ArrayList<Integer> qntList = new ArrayList<>();
 
@@ -66,7 +72,7 @@ public class Main {
                         System.out.println("Choose purchase location:");
                         System.out.println("1 - Store");
                         System.out.println("2 - Web");
-                        int location = inputInt(scanner);
+                        location = inputInt(scanner);
 
                         saleType = (location == 1) ? SaleType.STORE : SaleType.WEB;
 
@@ -79,30 +85,30 @@ public class Main {
 
                     while (true) {
                         products.listProducts();
-                        System.out.println("Enter product code or 0 to complete sale:");
-                        int code4 = inputInt(scanner);
+                        System.out.println("Enter product code or -1 to complete sale:");
+                        code = inputInt(scanner);
 
-                        if (code4 == 0) break;
+                        if (code == -1) break;
 
-                        Product p = products.findProduct(code4);
-                        if (p == null) {
+                        Product product = products.findProduct(code);
+                        if (product == null) {
                             System.out.println("Product not found.");
                             continue;
                         }
 
                         System.out.println("Enter quantity:");
-                        int qnt = inputInt(scanner);
+                        quantity = inputInt(scanner);
 
-                        wishList.add(p);
-                        qntList.add(qnt);
+                        wishList.add(product);
+                        qntList.add(quantity);
 
                         for (int i = 0; i < wishList.size(); i++) {
                             System.out.println("\t" + wishList.get(i).getName() + " - x" + qntList.get(i));
                         }
                     }
 
-                    SaleRequest saleReq = new SaleRequest(saleType, address, wishList, qntList);
-                    sales.registerSale(saleReq, products);
+                    SaleRequest salerequest = new SaleRequest(saleType, address, wishList, qntList);
+                    sales.registerSale(salerequest, products);
                     break;
 
                 case 5:
