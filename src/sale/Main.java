@@ -98,7 +98,7 @@ public class Main {
                     qntList.add(qnt);
 
                     for (int i = 0; i < wishList.size(); ++i) {
-                        System.out.println(wishList.get(i).getName() + " - x"+ qntList.get(i));
+                        System.out.println("\t" + wishList.get(i).getName() + " - x"+ qntList.get(i));
                     }
                 }
 

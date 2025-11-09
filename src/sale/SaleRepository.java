@@ -24,7 +24,7 @@ public class SaleRepository {
                 produtoEscolhido.removeStock(0);
                 continue;
             } else {
-                System.out.println("Este item não está em estoque na quantidade exigida: " + wishList.get(i).getName() + " - x" + qntList.get(i));
+                System.out.println("\nEste item não está em estoque na quantidade exigida: " + wishList.get(i).getName() + " - x" + qntList.get(i) + '\n');
                 continue;
             }
         }
