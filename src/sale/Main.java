@@ -1,9 +1,8 @@
 package sale;
-import product.*;
 
+import product.*;
 import java.util.ArrayList;
 import java.util.Scanner;
-
 
 public class Main {
     private static ProductRepository products = new ProductRepository();
@@ -11,168 +10,174 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        int opcao;
+        int option;
 
-        while(true) {
-            System.out.println("Digite a opção que deseja: ");
-            System.out.println("1- Registrar produto");
-            System.out.println("2- Listar produtos");
-            System.out.println("3- Adicionar produto no estoque");
-            System.out.println("4- Registrar venda");
-            System.out.println("5- Listar vendas");
-            System.out.println("6- Relatório");
-            System.out.println("7- sair");
+        while (true) {
+            showMenu();
 
-            opcao = Integer.parseInt(scanner.nextLine());
-            if(opcao == 1) {
-                System.out.println("Digite o nome do produto:");
-                String nome = scanner.nextLine();
+            option = Integer.parseInt(scanner.nextLine());
+            switch (option) {
 
-                System.out.println("Digite o codigo do produto");
-                int code = inputInt(scanner);
+                case 1:
+                    System.out.println("Enter product name:");
+                    String name = scanner.nextLine();
 
-                System.out.println("Digite o preço do produto");
-                double price = inputDouble(scanner);
-
-                products.registerProduct(nome, code, price);
-                System.out.println("");
-            }
-            else if(opcao == 2) {
-                products.listProducts();
-                System.out.println("");
-            }
-            else if(opcao == 3) {
-                while (true) {
-                    System.out.println("Digite o codigo do produto");
+                    System.out.println("Enter product code:");
                     int code = inputInt(scanner);
-                    if (products.findProduct(code) == null) {
-                        System.out.println("Digite um produto válido");
-                        continue;
-                    }
-                    System.out.println("Digite a quantidade para adicionar ao estoque");
-                    int quantity = inputInt(scanner);
 
-                    products.addStock(code, quantity);
-                    System.out.println("");
+                    System.out.println("Enter product price:");
+                    double price = inputDouble(scanner);
+
+                    products.registerProduct(name, code, price);
+                    System.out.println();
                     break;
-                }
-            }
-            else if(opcao == 4) {
-                SaleType tipoDeVenda;
-                String address = null;
 
-                ArrayList<Product> wishList = new ArrayList<>();
-                ArrayList<Integer> qntList = new ArrayList<>();
-
-                while (true) {
-                    System.out.println("Escolha o seu local de compra");
-                    System.out.println("1- Loja");
-                    System.out.println("2- Web");
-                    int local = inputInt(scanner);
-
-                    tipoDeVenda = (local == 1) ? SaleType.STORE : SaleType.WEB;
-
-                    if (tipoDeVenda == SaleType.WEB) {
-                        System.out.println("Digite seu endereço");
-                        address = scanner.nextLine();
-                    }
-                    break;
-                }
-                while (true) {
+                case 2:
                     products.listProducts();
+                    System.out.println();
+                    break;
 
-                    System.out.println("Digite o codigo do produto ou digite 0 para efetuar a venda");
-                    int code = inputInt(scanner);
-                    Product p = products.findProduct(code);
+                case 3:
+                    while (true) {
+                        System.out.println("Enter product code:");
+                        int code3 = inputInt(scanner);
 
-                    if (code == 0) break;
-                    else if (p == null) {
-                        System.out.println("Produto não encontrado");
-                        continue;
+                        if (products.findProduct(code3) == null) {
+                            System.out.println("Please enter a valid product.");
+                            continue;
+                        }
+
+                        System.out.println("Enter quantity to add to stock:");
+                        int quantity = inputInt(scanner);
+
+                        products.addStock(code3, quantity);
+                        System.out.println();
+                        break;
+                    }
+                    break;
+
+                case 4:
+                    SaleType saleType;
+                    String address = null;
+                    ArrayList<Product> wishList = new ArrayList<>();
+                    ArrayList<Integer> qntList = new ArrayList<>();
+
+                    while (true) {
+                        System.out.println("Choose purchase location:");
+                        System.out.println("1 - Store");
+                        System.out.println("2 - Web");
+                        int location = inputInt(scanner);
+
+                        saleType = (location == 1) ? SaleType.STORE : SaleType.WEB;
+
+                        if (saleType == SaleType.WEB) {
+                            System.out.println("Enter your address:");
+                            address = scanner.nextLine();
+                        }
+                        break;
                     }
 
-                    System.out.println("Digite a quantidade");
-                    int qnt = inputInt(scanner);
+                    while (true) {
+                        products.listProducts();
+                        System.out.println("Enter product code or 0 to complete sale:");
+                        int code4 = inputInt(scanner);
 
-                    wishList.add(products.findProduct(code));
-                    qntList.add(qnt);
+                        if (code4 == 0) break;
 
-                    for (int i = 0; i < wishList.size(); ++i) {
-                        System.out.println("\t" + wishList.get(i).getName() + " - x"+ qntList.get(i));
+                        Product p = products.findProduct(code4);
+                        if (p == null) {
+                            System.out.println("Product not found.");
+                            continue;
+                        }
+
+                        System.out.println("Enter quantity:");
+                        int qnt = inputInt(scanner);
+
+                        wishList.add(p);
+                        qntList.add(qnt);
+
+                        for (int i = 0; i < wishList.size(); i++) {
+                            System.out.println("\t" + wishList.get(i).getName() + " - x" + qntList.get(i));
+                        }
                     }
-                }
 
-                SaleRequest saleReq = new SaleRequest(tipoDeVenda, address, wishList, qntList);
-                sales.registerSale(saleReq, products);
-            }
-            else if(opcao == 5) {
-                sales.listSales();
-            }
-            else if(opcao == 6) {
-                sales.listInfoForEachSale();
+                    SaleRequest saleReq = new SaleRequest(saleType, address, wishList, qntList);
+                    sales.registerSale(saleReq, products);
+                    break;
 
-                System.out.println("Total de itens vendidos");
-                System.out.println(sales.totalItemsSold());
+                case 5:
+                    sales.listSales();
+                    break;
 
-                System.out.println("Valor total vendido");
-                System.out.println(sales.totalPrice());
-            }
-            else if(opcao == 7) {
-                scanner.close();
-                System.out.println("Encerrando programa");
-                System.exit(0);
-            }
-            else {
-                System.out.println("Escolha uma opção existente");
-            }
+                case 6:
+                    sales.listInfoForEachSale();
+                    System.out.println("Total items sold: " + sales.totalItemsSold());
+                    System.out.println("Total sales value: $" + sales.totalPrice());
+                    break;
 
+                case 7:
+                    scanner.close();
+                    System.out.println("Exiting program...");
+                    System.exit(0);
+                    break;
+
+                default:
+                    System.out.println("Choose a valid option.");
+                    break;
+            }
         }
-
     }
+
+    // ---------- Utility Methods ----------
 
     public static Integer convertToInt(String x) {
         try {
-            int resultado = Integer.parseInt(x);
-            return resultado;
-        }
-        catch(NumberFormatException e){
+            return Integer.parseInt(x);
+        } catch (NumberFormatException e) {
             return null;
         }
-
     }
 
     public static int inputInt(Scanner scanner) {
-        while(true) {
+        while (true) {
             String input = scanner.nextLine();
-            Integer resultado = convertToInt(input);
-            if(resultado == null) {
-                System.out.println("Digite um valor inteiro");
+            Integer result = convertToInt(input);
+            if (result == null) {
+                System.out.println("Enter an integer value.");
                 continue;
             }
-            return resultado;
+            return result;
         }
     }
 
-    public static Double convertToDouble (String x) {
+    public static Double convertToDouble(String x) {
         try {
-            double resultado = Double.parseDouble(x);
-            return resultado;
-        }
-        catch(NumberFormatException e){
+            return Double.parseDouble(x);
+        } catch (NumberFormatException e) {
             return null;
         }
-
     }
 
     public static double inputDouble(Scanner scanner) {
-        while(true) {
+        while (true) {
             String input = scanner.nextLine();
-            Double resultado = convertToDouble(input);
-            if(resultado == null) {
-                System.out.println("Digite um valor real");
+            Double result = convertToDouble(input);
+            if (result == null) {
+                System.out.println("Enter a real number value.");
                 continue;
             }
-            return resultado;
+            return result;
         }
+    }
+
+    public static void showMenu() {
+        System.out.println("Select an option:");
+        System.out.println("1 - Register product");
+        System.out.println("2 - List products");
+        System.out.println("3 - Add product stock");
+        System.out.println("4 - Register sale");
+        System.out.println("5 - List sales");
+        System.out.println("6 - Report");
+        System.out.println("7 - Exit");
     }
 }

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SaleRepository {
-    private List<Sale> sales = new ArrayList<>();
+	private List<Sale> sales = new ArrayList<>();
 
     public boolean isEmpty() {
         return this.sales.isEmpty();
@@ -18,19 +18,20 @@ public class SaleRepository {
         ArrayList<Integer> qntList = saleReq.qntList;
 
         for (int i = 0; i < wishList.size(); ++i) {
-            Product produtoEscolhido = products.findProduct(wishList.get(i).getCode());
-            if (produtoEscolhido.getStock() - qntList.get(i) >= 0) {
-                sale.addItem(produtoEscolhido, qntList.get(i));
-                produtoEscolhido.removeStock(0);
+            Product selectedProduct = products.findProduct(wishList.get(i).getCode());
+            if (selectedProduct.getStock() - qntList.get(i) >= 0) {
+                sale.addItem(selectedProduct, qntList.get(i));
+                selectedProduct.removeStock(0);
                 continue;
             } else {
-                System.out.println("\nEste item não está em estoque na quantidade exigida: " + wishList.get(i).getName() + " - x" + qntList.get(i) + '\n');
+                System.out.println("\nThis item is not available in the required quantity: " 
+                                   + wishList.get(i).getName() + " - x" + qntList.get(i) + '\n');
                 continue;
             }
         }
 
         sales.add(sale);
-        System.out.println("Venda efetuada!");
+        System.out.println("Sale completed!");
     }
 
     public void listSales() {
@@ -39,10 +40,10 @@ public class SaleRepository {
             return;
         }
         for (Sale s : sales) {
-            System.out.println(s.id + ":\n");
+            System.out.println("Sale #" + s.id + ":\n");
             for (SaleItem si : s.getItems()) {
                 Product p = si.getProduct();
-                System.out.println("\t " + p.getName() + " | R$: " + p.getPrice() + " | Qnt: " + si.getQuantity() + "\n");
+                System.out.println("\t " + p.getName() + " | Price: $" + p.getPrice() + " | Qty: " + si.getQuantity() + "\n");
             }
         }
     }
@@ -57,6 +58,7 @@ public class SaleRepository {
         }
         return total;
     }
+
     public double totalPrice() {
         if (sales.isEmpty()) {
             return 0.00;
@@ -68,6 +70,7 @@ public class SaleRepository {
         return total;
     }
 
+    // Tuple helper class
     protected class Tuple<X, Y> {
         final X left; 
         final Y right; 
@@ -75,11 +78,11 @@ public class SaleRepository {
             this.left = left; 
             this.right = right; 
         } 
-    };
+    }
 
     private List<Tuple<Product, Integer>> filterAmongSales(List<Tuple<Product, Integer>> allProducts) {
         List<Tuple<Product, Integer>> filteredProducts = new ArrayList<>();
-        for (int i = allProducts.size() - 1 ; i >= 0; --i) {
+        for (int i = allProducts.size() - 1; i >= 0; --i) {
             Tuple<Product, Integer> p = allProducts.get(i);
 
             int index = -1;
@@ -92,10 +95,13 @@ public class SaleRepository {
 
             if (index == -1) {
                 filteredProducts.add(p);
-            }
-            else {
-                filteredProducts
-                    .set( index, new Tuple<Product, Integer>( filteredProducts.get(index).left, filteredProducts.get(index).right + p.right) );
+            } else {
+                filteredProducts.set(index, 
+                    new Tuple<Product, Integer>(
+                        filteredProducts.get(index).left, 
+                        filteredProducts.get(index).right + p.right
+                    )
+                );
             }
         }
 
@@ -115,15 +121,15 @@ public class SaleRepository {
 
         List<Tuple<Product, Integer>> filteredProducts = filterAmongSales(allProducts);
 
-        for (Tuple<Product,Integer> t : filteredProducts) {
-            System.out.println('\t' + t.left.getName() + " | R$: " + t.left.getPrice() + " | Qnt:" + t.right + '\n');
+        for (Tuple<Product, Integer> t : filteredProducts) {
+            System.out.println('\t' + t.left.getName() + " | Price: $" + t.left.getPrice() + " | Qty: " + t.right + '\n');
         }
     }
 
     public Sale findSale(int id) {
         return sales.stream()
-        .filter(s -> s.getId() == id)
-        .findFirst()
-        .orElse(null);
+            .filter(s -> s.getId() == id)
+            .findFirst()
+            .orElse(null);
     }
 }
