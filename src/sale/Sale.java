@@ -6,7 +6,7 @@ import java.util.List;
 import product.Product;
 
 public abstract class Sale {
-protected List<SaleItem> items = new ArrayList<>();
+    protected List<SaleItem> items = new ArrayList<>();
 	
 	private static int sequentialId;
 	
@@ -19,13 +19,8 @@ protected List<SaleItem> items = new ArrayList<>();
 	
 	public abstract SaleType getType();
 	
-	public boolean addItem(Product product, int quantity) {
-		if (product.removeStock(quantity)) {
-            items.add(new SaleItem(product, quantity));
-            return true;
-        } else {
-        	return false;
-        }
+	public void addItem(Product product, int quantity) {
+        items.add(new SaleItem(product, quantity));
 	}
 	
 	public double getTotal() {
@@ -34,6 +29,10 @@ protected List<SaleItem> items = new ArrayList<>();
 
     public List<SaleItem> getItems() {
         return items;
+    }
+
+    public int getId() {
+        return id;
     }
     
     @Override

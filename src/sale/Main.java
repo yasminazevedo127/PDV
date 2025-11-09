@@ -1,97 +1,189 @@
 package sale;
 
+import product.*;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import product.Product;
+import java.util.Scanner;
 
 public class Main {
-	private List<Product> products = new ArrayList<>();
-	private List<Sale> sales = new ArrayList<>();
+    private static ProductRepository products = new ProductRepository();
+    private static SaleRepository sales = new SaleRepository();
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int option;
+        String name;
+        int code;
+        double price;
+        int quantity;
+        int location;
+        String address;
 
-	}
-	
-	
-	
-	public Product findProduct(int code) {
-        return products.stream()
-                .filter(p -> p.getCode() == code)
-                .findFirst()
-                .orElse(null);
+        while (true) {
+            showMenu();
+
+            option = Integer.parseInt(scanner.nextLine());
+            switch (option) {
+
+                case 1:
+                    System.out.println("Enter product name:");
+                    name = scanner.nextLine();
+
+                    System.out.println("Enter product code:");
+                    code = inputInt(scanner);
+
+                    System.out.println("Enter product price:");
+                    price = inputDouble(scanner);
+
+                    products.registerProduct(name, code, price);
+                    System.out.println();
+                    break;
+
+                case 2:
+                    products.listProducts();
+                    System.out.println();
+                    break;
+
+                case 3:
+                    while (true) {
+                        System.out.println("Enter product code:");
+                        code = inputInt(scanner);
+
+                        if (products.findProduct(code) == null) {
+                            System.out.println("Please enter a valid product.");
+                            continue;
+                        }
+
+                        System.out.println("Enter quantity to add to stock:");
+                        quantity = inputInt(scanner);
+
+                        products.addStock(code, quantity);
+                        System.out.println();
+                        break;
+                    }
+                    break;
+
+                case 4:
+                    SaleType saleType;
+                    address = null;
+                    ArrayList<Product> wishList = new ArrayList<>();
+                    ArrayList<Integer> qntList = new ArrayList<>();
+
+                    while (true) {
+                        System.out.println("Choose purchase location:");
+                        System.out.println("1 - Store");
+                        System.out.println("2 - Web");
+                        location = inputInt(scanner);
+
+                        saleType = (location == 1) ? SaleType.STORE : SaleType.WEB;
+
+                        if (saleType == SaleType.WEB) {
+                            System.out.println("Enter your address:");
+                            address = scanner.nextLine();
+                        }
+                        break;
+                    }
+
+                    while (true) {
+                        products.listProducts();
+                        System.out.println("Enter product code or -1 to complete sale:");
+                        code = inputInt(scanner);
+
+                        if (code == -1) break;
+
+                        Product product = products.findProduct(code);
+                        if (product == null) {
+                            System.out.println("Product not found.");
+                            continue;
+                        }
+
+                        System.out.println("Enter quantity:");
+                        quantity = inputInt(scanner);
+
+                        wishList.add(product);
+                        qntList.add(quantity);
+
+                        for (int i = 0; i < wishList.size(); i++) {
+                            System.out.println("\t" + wishList.get(i).getName() + " - x" + qntList.get(i));
+                        }
+                    }
+
+                    SaleRequest salerequest = new SaleRequest(saleType, address, wishList, qntList);
+                    sales.registerSale(salerequest, products);
+                    break;
+
+                case 5:
+                    sales.listSales();
+                    break;
+
+                case 6:
+                    sales.listInfoForEachSale();
+                    System.out.println("Total items sold: " + sales.totalItemsSold());
+                    System.out.println("Total sales value: $" + sales.totalPrice());
+                    break;
+
+                case 7:
+                    scanner.close();
+                    System.out.println("Exiting program...");
+                    System.exit(0);
+                    break;
+
+                default:
+                    System.out.println("Choose a valid option.");
+                    break;
+            }
+        }
     }
-	
-	 public void registerProduct(String name, int code, double price) {
-	        try {
-	            if (findProduct(code) != null)
-	                throw new IllegalStateException("Product code already exists: " + code);
-	            if (price <= 0) throw new IllegalArgumentException("Price must be positive");
 
-	            products.add(new Product(name, code, price));
-	            System.out.println("Product registered successfully.");
-	        } catch (IllegalArgumentException | IllegalStateException e) {
-	            System.out.println("⚠️ " + e.getMessage());
-	        }
-	    }
-	 
-	 public void listProducts() {
-	        if (products.isEmpty()) {
-	            System.out.println("No products registered.");
-	            return;
-	        }
-	        for (Product p : products) System.out.println(p);
-	    }
-	 
-	 public void addStock(int code, int quantity) {
-	        try {
-	            Product p = findProduct(code);
-	            if (p == null) throw new IllegalArgumentException("Product not found: " + code);
-	            if (quantity <= 0) throw new IllegalArgumentException("Quantity must be positive");
+    // ---------- Utility Methods ----------
 
-	            p.addStock(quantity);
-	            System.out.println("Stock updated successfully.");
-	        } catch (IllegalArgumentException e) {
-	            System.out.println("⚠️ " + e.getMessage());
-	        }
-	    }
-	 
-	 public void registerSale(SaleType type, String address, Map<Integer, Integer> itemsMap) {
-	        Sale sale = (type == SaleType.STORE) ? new Store() : new Web(address);
+    public static Integer convertToInt(String x) {
+        try {
+            return Integer.parseInt(x);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
 
-	        for (Map.Entry<Integer, Integer> entry : itemsMap.entrySet()) {
-	            Product p = findProduct(entry.getKey());
-	            int quantity = entry.getValue();
+    public static int inputInt(Scanner scanner) {
+        while (true) {
+            String input = scanner.nextLine();
+            Integer result = convertToInt(input);
+            if (result == null) {
+                System.out.println("Enter an integer value.");
+                continue;
+            }
+            return result;
+        }
+    }
 
-	            try {
-	                if (p == null)
-	                    throw new IllegalArgumentException("Product not found: " + entry.getKey());
-	                if (!p.removeStock(quantity))
-	                    throw new IllegalStateException("Insufficient stock for " + p.getName());
+    public static Double convertToDouble(String x) {
+        try {
+            return Double.parseDouble(x);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
 
-	                sale.addItem(p, quantity);
+    public static double inputDouble(Scanner scanner) {
+        while (true) {
+            String input = scanner.nextLine();
+            Double result = convertToDouble(input);
+            if (result == null) {
+                System.out.println("Enter a real number value.");
+                continue;
+            }
+            return result;
+        }
+    }
 
-	            } catch (IllegalArgumentException | IllegalStateException e) {
-	                System.out.println("⚠️ " + e.getMessage());
-	            }
-	        }
-
-	        if (!sale.getItems().isEmpty()) {
-	            sales.add(sale);
-	            System.out.println("Sale registered successfully!");
-	            System.out.println(sale); 
-	        } else {
-	            System.out.println("No valid items in sale. Sale not registered.");
-	        }
-	    }
-	
-	 public void listSales() {
-	        if (sales.isEmpty()) {
-	            System.out.println("No sales registered.");
-	            return;
-	        }
-	        for (Sale s : sales) System.out.println(s + "\n");
-	    }
+    public static void showMenu() {
+        System.out.println("Select an option:");
+        System.out.println("1 - Register product");
+        System.out.println("2 - List products");
+        System.out.println("3 - Add product stock");
+        System.out.println("4 - Register sale");
+        System.out.println("5 - List sales");
+        System.out.println("6 - Report");
+        System.out.println("7 - Exit");
+    }
 }

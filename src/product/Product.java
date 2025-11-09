@@ -2,12 +2,12 @@ package product;
 
 public class Product {
 	private String name;
-	private float code;
+	private int code;
 	private double price;
 	private int stock;
 	
 
-	public Product(String name, float code, double price) {
+	public Product(String name, int code, double price) {
 		// TODO Auto-generated constructor stub
 		this.name = name;
 		this.code = code;
@@ -44,12 +44,12 @@ public class Product {
 	}
 
 
-	public float getCode() {
+	public int getCode() {
 		return code;
 	}
 
 
-	public void setCode(float code) {
+	public void setCode(int code) {
 		this.code = code;
 	}
 
