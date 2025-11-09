@@ -4,7 +4,7 @@ import product.Product;
 
 public class SaleItem {
 	private Product product;
-	private int quantity;
+	private Integer quantity;
 	
 	public SaleItem(Product produto, int quantidade) {
 		// TODO Auto-generated constructor stub

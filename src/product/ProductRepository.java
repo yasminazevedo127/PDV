@@ -52,6 +52,6 @@ public class ProductRepository {
 	        System.out.println("No products registered.");
             return;
         }
-       for (Product p : products) System.out.println(p);
+       for (Product p : products) System.out.println("\t" + p);
     }
 }

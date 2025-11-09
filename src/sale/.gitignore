@@ -1,6 +1,9 @@
 /Main.class
 /Sale.class
 /SaleItem.class
+/SaleRepository.class
 /SaleType.class
 /Store.class
 /Web.class
+/SaleRepository$Tuple.class
+/SaleRequest.class
