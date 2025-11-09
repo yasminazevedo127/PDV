@@ -4,8 +4,6 @@ import product.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.util.Scanner;
-
 public class SaleRepository {
     private List<Sale> sales = new ArrayList<>();
 
@@ -13,51 +11,24 @@ public class SaleRepository {
         return this.sales.isEmpty();
     }
 
-    private static Integer convertToInt(String x) {
-        try {
-            int resultado = Integer.parseInt(x);
-            return resultado;
-        }
-        catch(NumberFormatException e){
-            return null;
-        }
+    public void registerSale(SaleRequest saleReq, ProductRepository products) {
+        Sale sale = (saleReq.type == SaleType.STORE) ? new Store() : new Web(saleReq.address);
 
-    }
-    private static int inputInt(Scanner scanner) {
-        while(true) {
-            String input = scanner.nextLine();
-            Integer resultado = convertToInt(input);
-            if(resultado == null) {
-                System.out.println("Digite um valor inteiro");
-                continue;
-            }
-            return resultado;
-        }
-    }
+        ArrayList<Product> wishList = saleReq.wishList;
+        ArrayList<Integer> qntList = saleReq.qntList;
 
-    public void registerSale(SaleType type, String address, ProductRepository products, Scanner scanner) {
-        Sale sale = (type == SaleType.STORE) ? new Store() : new Web(address);
-
-        while (true) {
-            products.listProducts();
-            System.out.println("Digite o codigo do produto ou digite 0 para efetuar a venda");
-            int code = inputInt(scanner);
-
-            if (code == 0) break;
-
-            System.out.println("Digite a quantidade");
-            int qnt = inputInt(scanner);
-
-            Product produtoEscolhido = products.findProduct(code);
-            if (produtoEscolhido != null && produtoEscolhido.getStock() > 0) {
-                sale.addItem(produtoEscolhido, qnt);
+        for (int i = 0; i < wishList.size(); ++i) {
+            Product produtoEscolhido = products.findProduct(wishList.get(i).getCode());
+            if (produtoEscolhido.getStock() - qntList.get(i) >= 0) {
+                sale.addItem(produtoEscolhido, qntList.get(i));
                 produtoEscolhido.removeStock(0);
                 continue;
             } else {
-                System.out.println("Este item não está em estoque ou não existe.");
+                System.out.println("Este item não está em estoque na quantidade exigida: " + wishList.get(i).getName() + " - x" + qntList.get(i));
                 continue;
             }
         }
+
         sales.add(sale);
         System.out.println("Venda efetuada!");
     }

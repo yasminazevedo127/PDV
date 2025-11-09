@@ -1,6 +1,7 @@
 package sale;
 import product.*;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
@@ -57,20 +58,52 @@ public class Main {
                 }
             }
             else if(opcao == 4) {
+                SaleType tipoDeVenda;
+                String address = null;
+
+                ArrayList<Product> wishList = new ArrayList<>();
+                ArrayList<Integer> qntList = new ArrayList<>();
+
                 while (true) {
                     System.out.println("Escolha o seu local de compra");
                     System.out.println("1- Loja");
                     System.out.println("2- Web");
-                    int code = inputInt(scanner);
-                    SaleType tipoDeVenda = (code == 1) ? SaleType.STORE : SaleType.WEB;
-                    String address = null;
+                    int local = inputInt(scanner);
+
+                    tipoDeVenda = (local == 1) ? SaleType.STORE : SaleType.WEB;
+
                     if (tipoDeVenda == SaleType.WEB) {
                         System.out.println("Digite seu endereço");
                         address = scanner.nextLine();
                     }
-                    sales.registerSale(tipoDeVenda, address, products, scanner);
                     break;
                 }
+                while (true) {
+                    products.listProducts();
+
+                    System.out.println("Digite o codigo do produto ou digite 0 para efetuar a venda");
+                    int code = inputInt(scanner);
+                    Product p = products.findProduct(code);
+
+                    if (code == 0) break;
+                    else if (p == null) {
+                        System.out.println("Produto não encontrado");
+                        continue;
+                    }
+
+                    System.out.println("Digite a quantidade");
+                    int qnt = inputInt(scanner);
+
+                    wishList.add(products.findProduct(code));
+                    qntList.add(qnt);
+
+                    for (int i = 0; i < wishList.size(); ++i) {
+                        System.out.println(wishList.get(i).getName() + " - x"+ qntList.get(i));
+                    }
+                }
+
+                SaleRequest saleReq = new SaleRequest(tipoDeVenda, address, wishList, qntList);
+                sales.registerSale(saleReq, products);
             }
             else if(opcao == 5) {
                 sales.listSales();

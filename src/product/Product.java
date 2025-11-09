@@ -44,7 +44,7 @@ public class Product {
 	}
 
 
-	public float getCode() {
+	public int getCode() {
 		return code;
 	}
 
